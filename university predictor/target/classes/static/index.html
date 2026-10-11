@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graduation Admission Predictor</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-container">
+            <h1 class="brand-title">Graduation Admission Predictor</h1>
+            <p class="brand-subtitle">Estimate admission chances for European universities based on your academic profile.</p>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Error notification banner -->
+        <div id="validationAlert" class="alert-banner hidden" role="alert">
+            <span class="alert-message" id="alertMessage">Please complete all required fields.</span>
+            <button class="alert-close" id="closeAlertBtn" aria-label="Dismiss">&times;</button>
+        </div>
+
+        <div class="app-grid">
+            <!-- Left column: input form -->
+            <section class="card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Student Profile</h2>
+                        <p class="card-desc">Enter your test scores and select target regions.</p>
+                    </div>
+                    <div class="preset-dropdown-group">
+                        <label for="samplePreset" class="preset-label">Sample profile:</label>
+                        <select id="samplePreset" class="preset-select">
+                            <option value="">Select...</option>
+                            <option value="competitive">High Scores</option>
+                            <option value="balanced">Average Scores</option>
+                            <option value="borderline">Low Scores with Research</option>
+                        </select>
+                    </div>
+                </div>
+
+                <form id="predictionForm" novalidate>
+                    <!-- GRE Score -->
+                    <div class="form-group">
+                        <div class="label-row">
+                            <label for="greInput">GRE Score <span class="range-hint">(260–340)</span></label>
+                            <span class="value-display" id="greDisplay">315</span>
+                        </div>
+                        <div class="slider-input-combo">
+                            <input type="range" id="greSlider" min="260" max="340" value="315" step="1" class="custom-slider">
+                            <input type="number" id="greInput" name="gre" min="260" max="340" value="315" class="custom-number-input" required>
+                        </div>
+                    </div>
+
+                    <!-- TOEFL Score -->
+                    <div class="form-group">
+                        <div class="label-row">
+                            <label for="toeflInput">TOEFL Score <span class="range-hint">(0–120)</span></label>
+                            <span class="value-display" id="toeflDisplay">100</span>
+                        </div>
+                        <div class="slider-input-combo">
+                            <input type="range" id="toeflSlider" min="0" max="120" value="100" step="1" class="custom-slider">
+                            <input type="number" id="toeflInput" name="toefl" min="0" max="120" value="100" class="custom-number-input" required>
+                        </div>
+                    </div>
+
+                    <!-- CGPA -->
+                    <div class="form-group">
+                        <div class="label-row">
+                            <label for="cgpaInput">CGPA <span class="range-hint">(0.0–10.0 scale)</span></label>
+                            <span class="value-display" id="cgpaDisplay">8.40</span>
+                        </div>
+                        <div class="slider-input-combo">
+                            <input type="range" id="cgpaSlider" min="0.0" max="10.0" value="8.4" step="0.05" class="custom-slider">
+                            <input type="number" id="cgpaInput" name="cgpa" min="0.0" max="10.0" value="8.4" step="0.01" class="custom-number-input" required>
+                        </div>
+                    </div>
+
+                    <!-- Research Experience -->
+                    <div class="form-group">
+                        <label class="group-label">Research Experience</label>
+                        <div class="checkbox-line">
+                            <label class="simple-checkbox-label">
+                                <input type="checkbox" id="researchCheckbox" name="research" checked>
+                                <span id="researchStatusText">Applicant has research or lab experience</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Target European Regions -->
+                    <div class="form-group">
+                        <div class="label-row">
+                            <label class="group-label">Preferred European Regions</label>
+                            <div class="region-actions">
+                                <button type="button" id="selectAllRegionsBtn" class="link-btn">Select all</button>
+                                <span>|</span>
+                                <button type="button" id="clearRegionsBtn" class="link-btn">Clear</button>
+                            </div>
+                        </div>
+                        <div class="region-checkbox-list">
+                            <label class="region-option">
+                                <input type="checkbox" name="regions" value="Western Europe" checked>
+                                <span>Western Europe <span class="region-notes">(UK, France, Netherlands, Ireland, Belgium)</span></span>
+                            </label>
+                            <label class="region-option">
+                                <input type="checkbox" name="regions" value="Northern Europe" checked>
+                                <span>Northern Europe <span class="region-notes">(Sweden, Denmark, Norway, Finland)</span></span>
+                            </label>
+                            <label class="region-option">
+                                <input type="checkbox" name="regions" value="Central Europe" checked>
+                                <span>Central Europe <span class="region-notes">(Germany, Switzerland, Austria, Poland)</span></span>
+                            </label>
+                            <label class="region-option">
+                                <input type="checkbox" name="regions" value="Southern Europe">
+                                <span>Southern Europe <span class="region-notes">(Italy, Spain, Portugal, Greece)</span></span>
+                            </label>
+                            <label class="region-option">
+                                <input type="checkbox" name="regions" value="Eastern Europe">
+                                <span>Eastern Europe <span class="region-notes">(Poland, Hungary, Romania, Bulgaria)</span></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Predictor Model Selection -->
+                    <div class="form-group">
+                        <label class="group-label">Prediction Method</label>
+                        <div class="predictor-options">
+                            <label class="radio-option">
+                                <input type="radio" name="predictor" value="weighted" checked>
+                                <div>
+                                    <strong>Weighted Score</strong>
+                                    <p class="option-desc">GRE 35%, TOEFL 25%, CGPA 30%, Research 10%.</p>
+                                </div>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="predictor" value="strict">
+                                <div>
+                                    <strong>Strict Minimums</strong>
+                                    <p class="option-desc">Penalises any score below the university's minimum requirement.</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="btn btn-primary">Predict Admission Chances</button>
+                </form>
+            </section>
+
+            <!-- Right column: Top 5 matches -->
+            <section class="card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Top 5 University Matches</h2>
+                        <p class="card-desc" id="resultsSubtext">Results will appear here ordered by admission probability.</p>
+                    </div>
+                    <span id="resultsCountBadge" class="count-badge hidden">5 Results</span>
+                </div>
+
+                <div id="resultsEmptyState" class="empty-state">
+                    <p class="empty-title">No predictions yet</p>
+                    <p class="empty-desc">Fill out the form on the left and click "Predict Admission Chances" to see matched universities.</p>
+                    <button type="button" id="quickTestBtn" class="btn btn-secondary">Run sample prediction</button>
+                </div>
+
+                <div id="resultsLoadingState" class="loading-state hidden">
+                    <p>Calculating admission chances...</p>
+                </div>
+
+                <div id="resultsList" class="results-list hidden">
+                    <!-- Cards rendered by app.js -->
+                </div>
+            </section>
+        </div>
+
+        <!-- Lower section: History -->
+        <section class="card history-card">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">Prediction History</h2>
+                    <p class="card-desc">Last 10 predictions saved in the database.</p>
+                </div>
+                <button type="button" id="refreshHistoryBtn" class="btn btn-secondary btn-sm">Refresh</button>
+            </div>
+
+            <div class="history-table-container">
+                <table class="history-table" id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Time</th>
+                            <th>GRE</th>
+                            <th>TOEFL</th>
+                            <th>CGPA</th>
+                            <th>Research</th>
+                            <th>Regions</th>
+                            <th>Top Result</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr>
+                            <td colspan="9" class="table-empty-cell">Loading history...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <p>Graduation Admission and Regional Preference Predictor</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
